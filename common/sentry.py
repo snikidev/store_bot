@@ -1,6 +1,8 @@
 import sentry_sdk
-import os
+from common.settings import Settings
 
-SENTRY_DSN = os.environ['SENTRY_DSN']
+settings = Settings()
 
-sentry_sdk.init(SENTRY_DSN, traces_sample_rate=1.0)
+
+sentry_sdk.init(settings.sentry_dsn, traces_sample_rate=1.0,
+                environment=settings.python_env)
