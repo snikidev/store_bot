@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, root_validator
 from common.settings import Settings
 from telebot.types import LabeledPrice
+from helpers.formatters import html_to_string_formatter
 
 settings = Settings()
 
@@ -15,13 +16,19 @@ class Product(BaseModel):
     photo_height: int = 512  # !=0/None or picture won't be shown
     photo_width: int = 1000
     photo_size: int = 512
-    currency: str = 'gbp'
+    currency: str = "gbp"
     prices: list = []
     photo_url: str = None
 
     @root_validator(pre=True)
     def get_nested_values(cls, values):
-        photo_url = values.get('media').get('source')
-        prices = [LabeledPrice(label=values.get(
-            'name'), amount=int(values.get('price').get('raw') * 100))]
-        return dict(values, photo_url=photo_url, prices=prices)
+        photo_url = values.get("media").get("source").replace(" ", "%20")
+        prices = [
+            LabeledPrice(
+                label=str(values.get("name")),
+                amount=int(values.get("price").get("raw") * 100),
+            )
+        ]
+        description = html_to_string_formatter(values.get("description"))
+
+        return dict(values, photo_url=photo_url, prices=prices, description=description)

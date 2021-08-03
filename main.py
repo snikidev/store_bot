@@ -15,6 +15,7 @@ bot = telebot.TeleBot(settings.bot_token, parse_mode=None)
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
+    # TODO: keyboard instead of just text
     try:
         products = list_products()
         bot.send_message(message.chat.id,
@@ -56,16 +57,16 @@ def command_terms(message):
     bot.send_message(message.chat.id, '📜 Terms & Conditions are currently being made.')
 
 
-@bot.inline_handler(lambda query: query.query == 'text')
-def query_text(inline_query):
-    logger.info(inline_query)
+@bot.inline_handler(lambda query: len(query.query) == 0)
+def query_all_products(inline_query):
+    try:
+        products = list_products()
+        send_products(bot, inline_query, products, inline=True)
+    except Exception as e:
+        logger.exception(e)
 
-
-@bot.chosen_inline_handler(func=lambda chosen_inline_result: True)
-def test_chosen(chosen_inline_result):
-    logger.info(chosen_inline_result)
 
 bot.skip_pending = True
 
-
+logger.info("Starting polling")
 bot.polling()
