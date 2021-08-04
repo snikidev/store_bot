@@ -12,7 +12,7 @@ import telebot
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 
 settings = Settings()
-bot = telebot.TeleBot(settings.bot_token, parse_mode=None)
+bot = telebot.TeleBot(settings.bot_token, parse_mode="Markdown")
 
 
 @bot.message_handler(commands=["start"])
@@ -24,7 +24,6 @@ def send_welcome(message):
 
     bot.send_message(
         message.chat.id,
-        # TODO: welcome message
         "Hi, and welome to the store!👋 Check out what we currently have on sale. Cheers! 🙌",
         parse_mode="Markdown",
         reply_markup=markup,
@@ -36,10 +35,14 @@ def handle_send_products(message):
     try:
         products = list_products()
         send_products(bot, message, products)
-    except:
+
+    except Exception as e:
+        logger.exception(e)
         bot.send_message(
             message.chat.id,
-            "Oops, something went wrong... Try getting products again by typing /products",
+            """🇬🇧 Oops, something went wrong... Try getting the products again. \
+            🇷🇺 Упс, что-то пошло не так... Попробуйте заного запросить продукты. 
+            """,
         )
 
 
@@ -48,7 +51,9 @@ def checkout(pre_checkout_query):
     bot.answer_pre_checkout_query(
         pre_checkout_query.id,
         ok=True,
-        error_message="Oops, something went wrong... We couldn't charge your card. Try again or contact our team for support.",
+        error_message="""🇬🇧 Oops, something went wrong... We couldn't charge your card. Try again or contact our team for support. \
+        🇷🇺 Упс, что-то пошло не так... Мы не смогли списать деньги с карты. Попробуйте заного или напишите в нашу службу поддержки и мы вам поможем разобраться. 
+        """,
     )
 
 
@@ -56,9 +61,7 @@ def checkout(pre_checkout_query):
 def got_payment(message):
     bot.send_message(
         message.chat.id,
-        "Thank you for shopping with our PoLa Baker Store bot! Fetching products for your order #{} ... 🛍".format(
-            message.successful_payment.provider_payment_charge_id
-        ),
+        f"🇬🇧 Thank you for shopping with our PoLa Baker Store bot! Fetching products for your order # {message.successful_payment.provider_payment_charge_id}... 🛍 | 🇷🇺 Спасибо за покупку у нашего PoLa Baker Store бота! Сейчас доставим продукты по Вашему заказу # {message.successful_payment.provider_payment_charge_id}... 🛍",
     )
     send_deliverables(bot, message, message.successful_payment.invoice_payload)
 
@@ -80,5 +83,4 @@ def query_all_products(inline_query):
 
 bot.skip_pending = True
 
-logger.info("Starting polling")
 bot.polling()
