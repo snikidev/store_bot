@@ -40,7 +40,7 @@ def handle_send_products(message):
         logger.exception(e)
         bot.send_message(
             message.chat.id,
-            """🇬🇧 Oops, something went wrong... Try getting the products again. \
+            """🇬🇧 Oops, something went wrong... Try getting the products again.  
             🇷🇺 Упс, что-то пошло не так... Попробуйте заного запросить продукты. 
             """,
         )
@@ -51,7 +51,7 @@ def checkout(pre_checkout_query):
     bot.answer_pre_checkout_query(
         pre_checkout_query.id,
         ok=True,
-        error_message="""🇬🇧 Oops, something went wrong... We couldn't charge your card. Try again or contact our team for support. \
+        error_message="""🇬🇧 Oops, something went wrong... We couldn't charge your card. Try again or contact our team for support.  
         🇷🇺 Упс, что-то пошло не так... Мы не смогли списать деньги с карты. Попробуйте заного или напишите в нашу службу поддержки и мы вам поможем разобраться. 
         """,
     )
@@ -61,7 +61,11 @@ def checkout(pre_checkout_query):
 def got_payment(message):
     bot.send_message(
         message.chat.id,
-        f"🇬🇧 Thank you for shopping with our PoLa Baker Store bot! Fetching products for your order # {message.successful_payment.provider_payment_charge_id}... 🛍 | 🇷🇺 Спасибо за покупку у нашего PoLa Baker Store бота! Сейчас доставим продукты по Вашему заказу # {message.successful_payment.provider_payment_charge_id}... 🛍",
+        """🇬🇧 Thank you for shopping with our PoLa Baker Store bot! Fetching products for your order # {}... 🛍  
+        🇷🇺 Спасибо за покупку у нашего PoLa Baker Store бота! Сейчас доставим продукты по Вашему заказу № {}... 🛍""".format(
+            message.successful_payment.provider_payment_charge_id,
+            message.successful_payment.provider_payment_charge_id,
+        ),
     )
     send_deliverables(bot, message, message.successful_payment.invoice_payload)
 
