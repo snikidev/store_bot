@@ -12,25 +12,27 @@ def send_products(bot: TeleBot, message, products, inline=False):
 
         for product in product_list:
             input_message_content = InputInvoiceMessageContent(
-                title=product.title,
-                description=product.description,
-                provider_token=product.provider_token,
                 currency=product.currency,
-                payload=product.invoice_payload,
-                prices=product.prices,
-                photo_url=product.photo_url,
-                photo_size=product.photo_size,
-                photo_width=product.photo_width,
-                photo_height=product.photo_height,
+                description=product.description,
                 is_flexible=product.is_flexible,
+                need_email=product.need_email,
+                payload=product.invoice_payload,
+                photo_height=product.photo_height,
+                photo_size=product.photo_size,
+                photo_url=product.photo_url,
+                photo_width=product.photo_width,
+                prices=product.prices,
+                provider_token=product.provider_token,
+                send_email_to_provider=product.send_email_to_provider,
+                title=product.title,
             )
 
             products_for_inline.append(
                 InlineQueryResultArticle(
                     id=product.invoice_payload,
-                    title=product.title,
                     input_message_content=input_message_content,
                     thumb_url=product.photo_url,
+                    title=product.title,
                 )
             )
 
