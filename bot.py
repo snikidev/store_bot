@@ -72,8 +72,16 @@ def got_payment(message):
 
 @bot.message_handler(func=lambda message: message.text == "📜 Terms / Условия")
 def command_terms(message):
-    # TODO: terms
-    bot.send_message(message.chat.id, "📜 Terms & Conditions are currently being made.")
+    bot.send_message(
+        message.chat.id,
+        """📜 Terms & Conditions
+        1. When you purchase access to the Digital Products you are purchasing a non-transferable, non-exclusive right to access the information. You may not publish or share the Digital Products with anyone else.
+        2. Return, refund and cancellation policy: Due to the nature of the product, we cannot offer refunds on Digital Products. Should you consider your situation to be a special circumstance then please get in contact with us and we shall consider your invidual request. In the event that we do issue a refund, your access to the Digital Products will be revoked.
+        3. PoLa Baker reserves all other rights.
+        4. PoLa Baker provides no guarantee of availability of the web server or hosting of the Digital Products. We will make commercially reasonable efforts to provide availability.
+        5. PoLa Baker reserves the right to vary these terms from time to time.
+        """,
+    )
 
 
 @bot.inline_handler(lambda query: len(query.query) == 0)
