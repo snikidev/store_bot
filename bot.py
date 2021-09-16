@@ -17,32 +17,50 @@ bot = telebot.TeleBot(settings.bot_token, parse_mode="Markdown")
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
+    print(message)
+    is_russian = message.from_user.language_code == "ru"
+
+    terms_button_text = "📜 Условия" if is_russian else "📜 Terms"
+    products_button_text = "🛍 Продукты" if is_russian else "🛍 Products"
+
     markup = ReplyKeyboardMarkup(row_width=1)
-    terms_button = KeyboardButton("📜 Terms / Условия")
-    products_button = KeyboardButton("🛍 Products / Продукты")
+    terms_button = KeyboardButton(terms_button_text)
+    products_button = KeyboardButton(products_button_text)
     markup.add(products_button, terms_button)
+
+    message_text = (
+        "Привет и добро пожаловать в PoLa Baker store bot!👋 Смотрите, что у нас в наличии! 🙌"
+        if is_russian
+        else "Hi, and welome to the PoLa Baker store bot!👋 Check out what we currently have on sale. Cheers! 🙌",
+    )
 
     bot.send_message(
         message.chat.id,
-        "Hi, and welome to the store!👋 Check out what we currently have on sale. Cheers! 🙌",
+        message_text,
         parse_mode="Markdown",
         reply_markup=markup,
     )
 
 
-@bot.message_handler(func=lambda message: message.text == "🛍 Products / Продукты")
+@bot.message_handler(
+    func=lambda message: message.text == "🛍 Products" or message.text == "🛍 Продукты"
+)
 def handle_send_products(message):
+    is_russian = message.from_user.language_code == "ru"
     try:
         products = list_products()
         send_products(bot, message, products)
 
     except Exception as e:
         logger.exception(e)
+        error_message = (
+            "Упс, что-то пошло не так... Попробуйте заного запросить продукты."
+            if is_russian
+            else "Oops, something went wrong... Try getting the products again."
+        )
         bot.send_message(
             message.chat.id,
-            """🇬🇧 Oops, something went wrong... Try getting the products again.  
-            🇷🇺 Упс, что-то пошло не так... Попробуйте заного запросить продукты. 
-            """,
+            error_message,
         )
 
 
@@ -59,18 +77,22 @@ def checkout(pre_checkout_query):
 
 @bot.message_handler(content_types=["successful_payment"])
 def got_payment(message):
-    bot.send_message(
-        message.chat.id,
-        """🇬🇧 Thank you for shopping with our PoLa Baker Store bot! Fetching products for your order # {}... 🛍  
-        🇷🇺 Спасибо за покупку у нашего PoLa Baker Store бота! Сейчас доставим продукты по Вашему заказу № {}... 🛍""".format(
-            message.successful_payment.provider_payment_charge_id,
-            message.successful_payment.provider_payment_charge_id,
-        ),
+    is_russian = message.from_user.language_code == "ru"
+    order_number = message.successful_payment.provider_payment_charge_id
+
+    message_text = (
+        f"Спасибо за покупку у нашего PoLa Baker Store бота! Сейчас доставим продукты по Вашему заказу №{order_number}... 🛍"
+        if is_russian
+        else f"Thank you for shopping with our PoLa Baker Store bot! Fetching products for your order #{order_number}... 🛍 "
     )
-    send_deliverables(bot, message, message.successful_payment.invoice_payload)
+    print(message_text)
+    bot.send_message(message.chat.id, message_text)
+    send_deliverables(bot, message)
 
 
-@bot.message_handler(func=lambda message: message.text == "📜 Terms / Условия")
+@bot.message_handler(
+    func=lambda message: message.text == "📜 Условия" or message.text == "📜 Terms"
+)
 def command_terms(message):
     bot.send_message(
         message.chat.id,

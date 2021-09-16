@@ -11,7 +11,9 @@ s3 = boto3.client(
 )
 
 
-def send_deliverables(bot, message, folder):
+def send_deliverables(bot, message):
+    folder = message.successful_payment.invoice_payload
+    print(folder)
     all_objects = s3.list_objects_v2(
         Bucket=settings.s3_bucket_name, Prefix=folder + "/", MaxKeys=100
     )
