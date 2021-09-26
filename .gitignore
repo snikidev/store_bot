@@ -1,3 +1,4 @@
 /.env
 /firebaseToken.json
 .vscode
+__pycache__/

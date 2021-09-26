@@ -1,5 +1,6 @@
 import boto3
 from common.settings import Settings
+from common.dictionary import dictionary
 
 settings = Settings()
 
@@ -11,7 +12,10 @@ s3 = boto3.client(
 )
 
 
-def send_deliverables(bot, message, folder):
+def send_deliverables(bot, message):
+    folder = message.successful_payment.invoice_payload
+    language_code = message.from_user.language_code
+
     all_objects = s3.list_objects_v2(
         Bucket=settings.s3_bucket_name, Prefix=folder + "/", MaxKeys=100
     )
@@ -30,15 +34,10 @@ def send_deliverables(bot, message, folder):
             ExpiresIn=172800,
         )
 
-        bot.send_message(
-            message.chat.id,
-            """{}/{}  
-            🇬🇧 Follow [this link]({}) to download the product. Download will start automatically. The link will be available for the next 48 hours. 
-              
-            🇷🇺 Пройдите по [этой ссылке]({}), чтобы скачать продукт. Скачивание начнется автоматически. Ссылка будет доступна в течении следующих 48 часов.  
-            """.format(
-                index + 1, len(deliverables), url, url
-            ),
+        message_text = dictionary[language_code].deliverable_message.format(
+            index + 1, len(deliverables), url, url
         )
+
+        bot.send_message(message.chat.id, message_text)
 
     return deliverables

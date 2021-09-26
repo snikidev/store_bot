@@ -2,14 +2,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-import common.sentry
+import common.sentry, logging, telebot
 from common.settings import Settings
 from common.send_products import send_products
 from common.list_products import list_products
 from common.send_deliverables import send_deliverables
+from common.dictionary import dictionary
 from loguru import logger
-import telebot
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+from helpers.formatters import escape_markdown_chars
 
 settings = Settings()
 bot = telebot.TeleBot(settings.bot_token, parse_mode="Markdown")
@@ -17,21 +18,29 @@ bot = telebot.TeleBot(settings.bot_token, parse_mode="Markdown")
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
+    language_code = message.from_user.language_code
+
     markup = ReplyKeyboardMarkup(row_width=1)
-    terms_button = KeyboardButton("📜 Terms / Условия")
-    products_button = KeyboardButton("🛍 Products / Продукты")
+    terms_button = KeyboardButton(dictionary[language_code].terms_and_conditions)
+    products_button = KeyboardButton(dictionary[language_code].products)
+
     markup.add(products_button, terms_button)
 
     bot.send_message(
         message.chat.id,
-        "Hi, and welome to the store!👋 Check out what we currently have on sale. Cheers! 🙌",
+        dictionary[language_code].start_message,
         parse_mode="Markdown",
         reply_markup=markup,
     )
 
 
-@bot.message_handler(func=lambda message: message.text == "🛍 Products / Продукты")
+@bot.message_handler(
+    func=lambda message: message.text == dictionary["en"].products
+    or message.text == dictionary["ru"].products
+)
 def handle_send_products(message):
+    language_code = message.from_user.language_code
+
     try:
         products = list_products()
         send_products(bot, message, products)
@@ -40,47 +49,47 @@ def handle_send_products(message):
         logger.exception(e)
         bot.send_message(
             message.chat.id,
-            """🇬🇧 Oops, something went wrong... Try getting the products again.  
-            🇷🇺 Упс, что-то пошло не так... Попробуйте заного запросить продукты. 
-            """,
+            dictionary[language_code].get_products_error,
         )
 
 
+# TODO: double check this
 @bot.pre_checkout_query_handler(func=lambda query: True)
 def checkout(pre_checkout_query):
+    logging.info("pre_checkout_query")
+    logging.info(pre_checkout_query)
+
+    language_code = pre_checkout_query.from_user.language_code
+
     bot.answer_pre_checkout_query(
         pre_checkout_query.id,
         ok=True,
-        error_message="""🇬🇧 Oops, something went wrong... We couldn't charge your card. Try again or contact our team for support.  
-        🇷🇺 Упс, что-то пошло не так... Мы не смогли списать деньги с карты. Попробуйте заного или напишите в нашу службу поддержки и мы вам поможем разобраться. 
-        """,
+        error_message=dictionary[language_code].pre_checkout_error,
     )
 
 
 @bot.message_handler(content_types=["successful_payment"])
 def got_payment(message):
-    bot.send_message(
-        message.chat.id,
-        """🇬🇧 Thank you for shopping with our PoLa Baker Store bot! Fetching products for your order # {}... 🛍  
-        🇷🇺 Спасибо за покупку у нашего PoLa Baker Store бота! Сейчас доставим продукты по Вашему заказу № {}... 🛍""".format(
-            message.successful_payment.provider_payment_charge_id,
-            message.successful_payment.provider_payment_charge_id,
-        ),
+    language_code = message.from_user.language_code
+    order_number = escape_markdown_chars(
+        message.successful_payment.provider_payment_charge_id
     )
-    send_deliverables(bot, message, message.successful_payment.invoice_payload)
+
+    message_text = dictionary[language_code].success_message.format(order_number)
+
+    bot.send_message(message.chat.id, message_text)
+    send_deliverables(bot, message)
 
 
-@bot.message_handler(func=lambda message: message.text == "📜 Terms / Условия")
+@bot.message_handler(
+    func=lambda message: message.text == dictionary["en"].terms_and_conditions
+    or message.text == dictionary["ru"].terms_and_conditions
+)
 def command_terms(message):
+    language_code = message.from_user.language_code
+
     bot.send_message(
-        message.chat.id,
-        """📜 Terms & Conditions
-        1. When you purchase access to the Digital Products you are purchasing a non-transferable, non-exclusive right to access the information. You may not publish or share the Digital Products with anyone else.
-        2. Return, refund and cancellation policy: Due to the nature of the product, we cannot offer refunds on Digital Products. Should you consider your situation to be a special circumstance then please get in contact with us and we shall consider your invidual request. In the event that we do issue a refund, your access to the Digital Products will be revoked.
-        3. PoLa Baker reserves all other rights.
-        4. PoLa Baker provides no guarantee of availability of the web server or hosting of the Digital Products. We will make commercially reasonable efforts to provide availability.
-        5. PoLa Baker reserves the right to vary these terms from time to time.
-        """,
+        message.chat.id, dictionary[language_code].terms_and_conditions_text
     )
 
 
