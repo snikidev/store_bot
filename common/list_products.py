@@ -4,17 +4,10 @@ from helpers.mappers import map_products
 
 settings = Settings()
 
-url = 'https://api.chec.io/v1/products'
-params = {
-    'limit': '25',
-}
-headers = {
-    'X-Authorization': settings.commercejs_token
-}
-
 
 def list_products():
-    products = requests.request(
-        'GET', url, headers=headers, params=params).json()
-    mapped_products = map(map_products, products['data'])
+    url = settings.airtable_api_url + f"?api_key={settings.airtable_api_key}"
+    products = requests.request("GET", url).json()
+    mapped_products = map_products(products["records"])
+
     return mapped_products
