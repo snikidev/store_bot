@@ -53,9 +53,10 @@ def handle_send_products(message):
         )
 
 
-# TODO: check and change this
+# TODO: double check this
 @bot.pre_checkout_query_handler(func=lambda query: True)
 def checkout(pre_checkout_query):
+    logging.info("pre_checkout_query")
     logging.info(pre_checkout_query)
 
     language_code = pre_checkout_query.from_user.language_code
