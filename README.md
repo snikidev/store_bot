@@ -1,5 +1,6 @@
-# Telegram StoreBot 
-> feat. Commerce.js and AWS S3
+# Telegram StoreBot
+
+> feat. [Airtable](https://airtable.com)
 
 This is a Telegram Bot that helps sell products on Telegram through its native Payments API.
 
