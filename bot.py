@@ -104,4 +104,4 @@ def query_all_products(inline_query):
 
 bot.skip_pending = True
 
-bot.polling()
+bot.infinity_polling()
