@@ -1,7 +1,7 @@
 en = {
     "terms_and_conditions": "📜 Terms",
     "products": "🛍 Products",
-    "start_message": "Hi, and welome to the PoLa Baker store bot!👋 Check out what we currently have on sale. Cheers! 🙌",
+    "start_message": "Hi, and welcome to the PoLa Baker store bot!👋 Check out what we currently have on sale. Cheers! 🙌",
     "get_products_error": "Oops, something went wrong... Try getting the products again.",
     "pre_checkout_error": "Oops, something went wrong... We couldn't charge your card. Try again or contact our team for support.",
     "success_message": "Thank you for shopping with our PoLa Baker Store bot! Fetching products for your order no. {0}... 🛍 ",
