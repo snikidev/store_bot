@@ -12,6 +12,7 @@ mccabe==0.6.1
 platformdirs==2.4.0
 pydantic==1.8.2
 pylint==2.11.1
+python-dotenv==0.19.0
 python-telegram-bot==13.7
 pytz==2021.1
 requests==2.26.0
