@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, root_validator
 from common.settings import Settings
-from telebot.types import LabeledPrice
+from telegram import LabeledPrice
 
 settings = Settings()
 
@@ -9,7 +9,7 @@ class Product(BaseModel):
     currency: str = "gbp"
     description: str
     title: str
-    invoice_payload: str = Field(alias="id")
+    payload: str = Field(alias="id")
     is_flexible: bool = False  # True If you need to set up Shipping Fee
     need_email: bool = True
     photo_height: int = 512  # !=0/None or picture won't be shown

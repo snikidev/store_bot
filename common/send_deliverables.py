@@ -1,11 +1,13 @@
+from telegram import Update, ParseMode
+from telegram.ext import CallbackContext
 from common.get_deliverables import get_deliverables
 from common.dictionary import dictionary
 
 
-def send_deliverables(bot, message):
+def send_deliverables(update: Update, context: CallbackContext):
     language_code, invoice_payload = (
-        message.from_user.language_code,
-        message.successful_payment.invoice_payload,
+        update.message.from_user.language_code,
+        update.message.successful_payment.invoice_payload,
     )
 
     deliverables = get_deliverables(invoice_payload)
@@ -16,4 +18,4 @@ def send_deliverables(bot, message):
             index + 1, len(deliverables), url
         )
 
-        bot.send_message(message.chat.id, message_text)
+        context.bot.send_message(update.message.chat.id, message_text, parse_mode=ParseMode.MARKDOWN,)

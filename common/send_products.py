@@ -1,11 +1,12 @@
-from telebot import TeleBot
-from telebot.types import (
+from telegram.ext import CallbackContext
+from loguru import logger
+from telegram import (
     InlineQueryResultArticle,
     InputInvoiceMessageContent,
 )
 
 
-def send_products(bot: TeleBot, message, products, inline=False):
+def send_products(chat_id, context: CallbackContext, products, inline=False):
     product_list = list(products)
     if inline:
         products_for_inline = []
@@ -36,8 +37,7 @@ def send_products(bot: TeleBot, message, products, inline=False):
                 )
             )
 
-        bot.answer_inline_query(message.id, products_for_inline)
-
+        context.bot.answer_inline_query(chat_id, products_for_inline)
     else:
         for product in product_list:
-            bot.send_invoice(message.chat.id, **product.dict())
+            context.bot.send_invoice(chat_id, **product.dict())
