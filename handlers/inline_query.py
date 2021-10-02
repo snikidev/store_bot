@@ -6,10 +6,8 @@ from loguru import logger
 
 
 def inline_query(update: Update, context: CallbackContext) -> None:
-    chat_id = update.message.chat_id
-
     try:
         products = list_products()
-        send_products(chat_id, context, products, inline=True)
+        send_products(update, context, products, inline=True)
     except Exception as e:
         logger.exception(e)

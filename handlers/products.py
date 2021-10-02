@@ -11,7 +11,7 @@ def products_handler(update: Update, context: CallbackContext) -> None:
 
     try:
         products = list_products()
-        send_products(chat_id, context, products)
+        send_products(update, context, products)
 
     except Exception as e:
         logger.exception(e)

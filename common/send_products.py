@@ -6,7 +6,7 @@ from telegram import (
 )
 
 
-def send_products(chat_id, context: CallbackContext, products, inline=False):
+def send_products(update, context: CallbackContext, products, inline=False):
     product_list = list(products)
     if inline:
         products_for_inline = []
@@ -17,7 +17,7 @@ def send_products(chat_id, context: CallbackContext, products, inline=False):
                 description=product.description,
                 is_flexible=product.is_flexible,
                 need_email=product.need_email,
-                payload=product.invoice_payload,
+                payload=product.payload,
                 photo_height=product.photo_height,
                 photo_size=product.photo_size,
                 photo_url=product.photo_url,
@@ -30,14 +30,15 @@ def send_products(chat_id, context: CallbackContext, products, inline=False):
 
             products_for_inline.append(
                 InlineQueryResultArticle(
-                    id=product.invoice_payload,
+                    id=product.payload,
                     input_message_content=input_message_content,
                     thumb_url=product.photo_url,
                     title=product.title,
                 )
             )
 
-        context.bot.answer_inline_query(chat_id, products_for_inline)
+        update.inline_query.answer(products_for_inline)
     else:
+        chat_id = update.message.chat_id
         for product in product_list:
             context.bot.send_invoice(chat_id, **product.dict())
