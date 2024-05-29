@@ -1,6 +1,6 @@
 <p align="center">
   <br>
-  <img width="300" src="media/storebot-logo.svg" alt="StoreBot">
+  <img width="100" src="media/storebot-logo.svg" alt="StoreBot">
   <br>
   <br>
 </p>
