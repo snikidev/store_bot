@@ -1,3 +1,10 @@
+<p align="center">
+  <br>
+  <img width="300" src="media/storebot-logo.png" alt="StoreBot">
+  <br>
+  <br>
+</p>
+
 # Telegram StoreBot
 
 > Easy way to sell your digital goods online
